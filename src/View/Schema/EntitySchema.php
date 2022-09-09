@@ -76,8 +76,8 @@ class EntitySchema extends SchemaProvider
     public function getAttributes($resource)
     {
         if ($resource->has($this->idField)) {
-            $hidden = array_merge($resource->hiddenProperties(), [$this->idField]);
-            $resource->hiddenProperties($hidden);
+            $hidden = array_merge($resource->getHidden(), [$this->idField]);
+            $resource->setHidden($hidden);
         }
 
         return $resource->toArray();
@@ -86,7 +86,7 @@ class EntitySchema extends SchemaProvider
     /**
      * Return the view instance
      *
-     * @return Cake\View\View View instance
+     * @return \Cake\View\View View instance
      */
     public function getView()
     {

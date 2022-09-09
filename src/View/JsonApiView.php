@@ -4,8 +4,8 @@ namespace JsonApi\View;
 use Cake\Core\App;
 use Cake\Core\Configure;
 use Cake\Event\EventManager;
-use Cake\Network\Request;
-use Cake\Network\Response;
+use Cake\Http\ServerRequest;
+use Cake\Http\Response;
 use Cake\ORM\Exception\MissingEntityException;
 use Cake\Utility\Hash;
 use Cake\View\View;
@@ -37,13 +37,13 @@ class JsonApiView extends View
     /**
      * Constructor
      *
-     * @param \Cake\Network\Request $request Request instance.
-     * @param \Cake\Network\Response $response Response instance.
+     * @param \Cake\Http\ServerRequest $request Request instance.
+     * @param \Cake\Http\Response $response Response instance.
      * @param \Cake\Event\EventManager $eventManager EventManager instance.
      * @param array $viewOptions An array of view options
      */
     public function __construct(
-        Request $request = null,
+        ServerRequest $request = null,
         Response $response = null,
         EventManager $eventManager = null,
         array $viewOptions = []
@@ -51,7 +51,7 @@ class JsonApiView extends View
         parent::__construct($request, $response, $eventManager, $viewOptions);
 
         if ($response && $response instanceof Response) {
-            $response->type('jsonapi');
+            $response->withType('jsonapi');
         }
     }
 
@@ -125,7 +125,7 @@ class JsonApiView extends View
      * @return string The serialized data
      * @throws MissingViewVarException when required view variable was not set
      */
-    public function render($view = null, $layout = null)
+    public function render($view = null, $layout = null): string
     {
         $include = $fieldsets = $schemas = $links = $meta = [];
         $parameters = $serialize = $url = null;
