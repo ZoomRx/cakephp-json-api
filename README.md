@@ -1,4 +1,4 @@
-# Upgraded josbeir/cakephp-json-api for CakePHP 4.0
+# Upgraded josbeir/cakephp-json-api for CakePHP 4.4
 
 ![json:api](http://jsonapi.org/images/jsonapi.png)
 
