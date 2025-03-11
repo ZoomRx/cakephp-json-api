@@ -8,7 +8,6 @@ use Cake\Http\ServerRequest;
 use Cake\Http\Response;
 use Cake\ORM\Exception\MissingEntityException;
 use Cake\Utility\Hash;
-use Cake\Utility\Inflector;
 use Cake\View\View;
 use JsonApi\View\Exception\MissingViewVarException;
 use Neomerx\JsonApi\Encoder\Encoder;
@@ -182,81 +181,7 @@ class JsonApiView extends View
 
         $parameters = new EncodingParameters($include, $fieldsets);
 
-        $encodedData = $encoder->encodeData($serialize, $parameters);
-
-        $decodedData = json_decode($encodedData, true);
-        if (json_last_error() === JSON_ERROR_NONE) {
-            $singularizedData = $this->convertRelationshipsToSingular($decodedData);
-            $singularizedData = json_encode($singularizedData);
-            if (json_last_error() === JSON_ERROR_NONE) {
-                return $singularizedData;
-            }
-        }
-        
-        return $encodedData;
-    }
-
-    /**
-     * Converts relationship keys from plural to singular form for migrated tables.
-     * 
-     * This method processes JSON:API formatted data and converts relationship keys 
-     * to their singular form for specific table types that have been migrated. 
-     * It handles both single resources and collections, including any included resources.
-     *
-     * @param array $decodedData The JSON:API formatted data as an associative array
-     *                          Expected to have 'data' and optional 'included' keys
-     * @return array The modified data with singular relationship keys where applicable
-     * 
-     * Structure:
-     * - Processes main data object/collection
-     * - Processes included resources
-     * - Only modifies relationships for types defined in FOALTS_MIGRATED_TABLES
-     * - Converts only relationship keys that have single resource linkage
-     */
-    protected function convertRelationshipsToSingular($decodedData) {
-        function processRelationships(&$data) {
-            if (!isset($data['type'])) {
-                return;
-            }
-            if (!isset(FOALTS_MIGRATED_TABLES[Inflector::underscore($data['type'])])) {
-                return;
-            }
-
-            $clonedData = json_decode(json_encode($data), true);
-            if (isset($clonedData['relationships'])) {
-                foreach ($clonedData['relationships'] as $relationshipKey => $relationship) {
-
-                    if (
-                        isset($relationship['data']) && 
-                        is_array($relationship['data']) && 
-                        isset($relationship['data']['type'])
-                    ) {
-                        $singularKey = Inflector::singularize($relationshipKey);
-                        $data['relationships'][$singularKey] = $relationship;
-                        unset($data['relationships'][$relationshipKey]);
-                    }
-                }
-            }
-        }
-
-        if (isset($decodedData['data'])) {
-            // Check if 'data' is an array or object and process accordingly
-            if (isset($decodedData['data']['type'])) {
-                processRelationships($decodedData['data']);
-            } else {
-                foreach ($decodedData['data'] as &$item) {
-                    processRelationships($item);
-                }
-            }
-        }
-
-        if (isset($decodedData['included'])) {
-            foreach ($decodedData['included'] as &$includedItem) {
-                processRelationships($includedItem);
-            }
-        }
-
-        return $decodedData;
+        return $encoder->encodeData($serialize, $parameters);
     }
 
     /**
